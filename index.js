@@ -1,12 +1,9 @@
 const express = require('express');
 require("dotenv").config();
 const { Client } = require("pg");
-
-const app = express();
+const http = require('http');
 
 const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
 
 const CONFIG_DB = {
   user: process.env.DB_USER,
@@ -18,6 +15,23 @@ const CONFIG_DB = {
     rejectUnauthorized: true, // Configuración para conexiones SSL
   },
 };
+
+const server = http.createServer((req, res) => {
+
+  res.setHeader('Content-Type', 'application/json');
+
+  if (req.method === 'GET' && req.url === '/') {
+    res.writeHead(200);
+    res.end(JSON.stringify({ message: '¡Bienvenido a la API básica sin Express!' }));
+  } else {
+    res.writeHead(404);
+    res.end(JSON.stringify({ message: 'Ruta no encontrada' }));
+  }
+});
+
+const app = express();
+
+app.use(express.json());
 
 const db = new Client(CONFIG_DB);
 
@@ -34,23 +48,50 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
+    res.send('¡Hola, esta es una API básica en Node.js!');
+});
+
+app.get('/data', async (req, res) => {
   try {
     const result = await db.query("SELECT * from test");
-    res.send(`Resultados de la consulta: ${JSON.stringify(result.rows)}`);
+    res.json({result: result.rows});
   } catch (err) {
     console.error("Error ejecutando la consulta:", err);
-
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
-app.get('/data', (req, res) => {
-  res.json({ message: 'Esta es la ruta /data', data: [1, 2, 3] });
+app.get('/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(`SELECT * from test WHERE id =${id}`);
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error ejecutando la consulta:", err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
-app.post('/data', (req, res) => {
-  const newData = req.body;
-  res.status(201).json({ message: 'Datos recibidos', data: newData });
+app.post('/data', async(req, res) => {
+  try {
+    const { name, lastname, age, gender } = req.body;
+    const query = `INSERT INTO public.test (id, "name", lastname, age, gender) 
+    VALUES(nextval('test_id_seq'::regclass), '${name}', '${lastname}', '${age}', '${gender}') RETURNING *`;
+    const result = await db.query(query);
+
+    res.status(201).json({ message: 'Datos insertados correctamente', data: result.rows[0] });
+  } catch (err) {
+    console.error("Error ejecutando la consulta:", err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+ 
+
 });
 
 app.listen(PORT, () => {
