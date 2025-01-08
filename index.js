@@ -2,6 +2,7 @@ const express = require('express');
 require("dotenv").config();
 const { Client } = require("pg");
 const http = require('http');
+const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
@@ -32,6 +33,7 @@ const server = http.createServer((req, res) => {
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 const db = new Client(CONFIG_DB);
 
