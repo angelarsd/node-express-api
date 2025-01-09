@@ -82,9 +82,9 @@ app.get('/data/:id', async (req, res) => {
 
 app.post('/data', async(req, res) => {
   try {
-    const { name, lastname, age, gender } = req.body;
-    const query = `INSERT INTO public.test (id, "name", lastname, age, gender) 
-    VALUES(nextval('test_id_seq'::regclass), '${name}', '${lastname}', '${age}', '${gender}') RETURNING *`;
+    const { name, lastname, age, gender, email } = req.body;
+    const query = `INSERT INTO public.test (id, "name", lastname, age, gender, email) 
+    VALUES(nextval('test_id_seq'::regclass), '${name}', '${lastname}', '${age}', '${gender}', '${email}') RETURNING *`;
     const result = await db.query(query);
 
     res.status(201).json({ message: 'Datos insertados correctamente', data: result.rows[0] });
@@ -99,14 +99,14 @@ app.post('/data', async(req, res) => {
 app.put('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, lastname, age, gender } = req.body;
+    const { name, lastname, age, gender, email } = req.body;
      const result = await db.query(`SELECT * from test WHERE id =${id}`);
 
     if (!result.rows[0]) {
       return res.status(404).json({ error: "Resource not found" });
     }
 
-    const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}' WHERE id =${id}`);
+    const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}', age='${age}', email='${email}' WHERE id =${id}`);
 
     res.json({ message: 'Datos actualizados correctamente', data: data.rows[0]  });
   } catch (err) {
