@@ -13,7 +13,7 @@ const CONFIG_DB = {
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: true, // Configuración para conexiones SSL
+    rejectUnauthorized: true, // SSL connection settings
   },
 };
 
@@ -23,10 +23,10 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200);
-    res.end(JSON.stringify({ message: '¡Bienvenido a la API básica sin Express!' }));
+    res.end(JSON.stringify({ message: 'Welcome to the basic API without Express!' }));
   } else {
     res.writeHead(404);
-    res.end(JSON.stringify({ message: 'Ruta no encontrada' }));
+    res.end(JSON.stringify({ message: 'Route not found' }));
   }
 });
 
@@ -45,13 +45,13 @@ app.use(async (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("Error conectando a la base de datos:", err);
-    res.status(500).send("Error conectando a la base de datos");
+    console.error("Error connecting to the database:", err);
+    res.status(500).send("Error connecting to the database");
   }
 });
 
 app.get('/', (req, res) => {
-    res.send('¡Hola, esta es una API básica en Node.js!');
+    res.send('Hello, this is a basic API in Node.js!');
 });
 
 app.get('/data', async (req, res) => {
@@ -59,8 +59,8 @@ app.get('/data', async (req, res) => {
     const result = await db.query("SELECT * from test");
     res.json({result: result.rows});
   } catch (err) {
-    console.error("Error ejecutando la consulta:", err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error executing the query:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -75,8 +75,8 @@ app.get('/data/:id', async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error ejecutando la consulta:", err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error executing the query:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -87,20 +87,18 @@ app.post('/data', async(req, res) => {
     VALUES(nextval('test_id_seq'::regclass), '${name}', '${lastname}', '${age}', '${gender}', '${email}') RETURNING *`;
     const result = await db.query(query);
 
-    res.status(201).json({ message: 'Datos insertados correctamente', data: result.rows[0] });
+    res.status(201).json({ message: 'Data inserted successfully', data: result.rows[0] });
   } catch (err) {
-    console.error("Error ejecutando la consulta:", err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error executing the query:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
- 
-
 });
 
 app.put('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, lastname, age, gender, email } = req.body;
-     const result = await db.query(`SELECT * from test WHERE id =${id}`);
+    const result = await db.query(`SELECT * from test WHERE id =${id}`);
 
     if (!result.rows[0]) {
       return res.status(404).json({ error: "Resource not found" });
@@ -108,10 +106,10 @@ app.put('/data/:id', async (req, res) => {
 
     const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}', age='${age}', email='${email}' WHERE id =${id}`);
 
-    res.json({ message: 'Datos actualizados correctamente', data: data.rows[0]  });
+    res.json({ message: 'Data updated successfully', data: data.rows[0] });
   } catch (err) {
-    console.error("Error ejecutando la consulta:", err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error executing the query:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -126,19 +124,19 @@ app.delete('/data/:id', async (req, res) => {
 
     await db.query(`DELETE from test WHERE id =${id}`);
 
-    res.json({ message: 'Datos eliminados correctamente' });
+    res.json({ message: 'Data deleted successfully', data: data.rows[0] });
   } catch (err) {
-    console.error("Error ejecutando la consulta:", err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error executing the query:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 process.on("SIGINT", async () => {
-  console.log("Cerrando la conexión...");
+  console.log("Closing the connection...");
   if (db._connected) {
     await db.end();
   }
