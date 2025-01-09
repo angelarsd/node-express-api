@@ -100,13 +100,15 @@ app.put('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, lastname, age, gender } = req.body;
-    const result = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}' WHERE id =${id}`);
+     const result = await db.query(`SELECT * from test WHERE id =${id}`);
 
     if (!result.rows[0]) {
       return res.status(404).json({ error: "Resource not found" });
     }
 
-    res.json({ message: 'Datos actualizados correctamente' });
+    const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}' WHERE id =${id}`);
+
+    res.json({ message: 'Datos actualizados correctamente', data: data.rows[0]  });
   } catch (err) {
     console.error("Error ejecutando la consulta:", err);
     res.status(500).json({ error: 'Error interno del servidor' });
