@@ -1,7 +1,7 @@
 const express = require('express');
 require("dotenv").config();
 const { Client } = require("pg");
-const http = require('http');
+//const http = require('http');
 const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
@@ -17,18 +17,18 @@ const CONFIG_DB = {
   },
 };
 
-const server = http.createServer((req, res) => {
+// const server = http.createServer((req, res) => {
 
-  res.setHeader('Content-Type', 'application/json');
+//   res.setHeader('Content-Type', 'application/json');
 
-  if (req.method === 'GET' && req.url === '/') {
-    res.writeHead(200);
-    res.end(JSON.stringify({ message: 'Welcome to the basic API without Express!' }));
-  } else {
-    res.writeHead(404);
-    res.end(JSON.stringify({ message: 'Route not found' }));
-  }
-});
+//   if (req.method === 'GET' && req.url === '/') {
+//     res.writeHead(200);
+//     res.end(JSON.stringify({ message: 'Welcome to the basic API without Express!' }));
+//   } else {
+//     res.writeHead(404);
+//     res.end(JSON.stringify({ message: 'Route not found' }));
+//   }
+// });
 
 const app = express();
 
@@ -124,7 +124,7 @@ app.delete('/data/:id', async (req, res) => {
 
     await db.query(`DELETE from test WHERE id =${id}`);
 
-    res.json({ message: 'Data deleted successfully', data: data.rows[0] });
+    res.json({ message: 'Data deleted successfully', data: result.rows[0] });
   } catch (err) {
     console.error("Error executing the query:", err);
     res.status(500).json({ error: 'Internal server error' });
