@@ -96,6 +96,39 @@ app.post('/data', async(req, res) => {
 
 });
 
+app.update('/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, lastname, age, gender } = req.body;
+    const result = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', age='${age}', gender='${gender}' WHERE id =${id}`);
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+
+    res.json({ message: 'Datos actualizados correctamente' });
+  } catch (err) {
+    console.error("Error ejecutando la consulta:", err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.delete('/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(`DELETE from test WHERE id =${id}`);
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+
+    res.json({ message: 'Datos eliminados correctamente' });
+  } catch (err) {
+    console.error("Error ejecutando la consulta:", err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
