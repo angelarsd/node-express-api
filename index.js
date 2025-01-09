@@ -104,7 +104,7 @@ app.put('/data/:id', async (req, res) => {
       return res.status(404).json({ error: "Resource not found" });
     }
 
-    const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', gender='${gender}', age='${age}', email='${email}' WHERE id =${id}`);
+    const data = await db.query(`UPDATE test SET "name"='${name}', lastname='${lastname}', gender='${gender}', age='${age}', email='${email}' WHERE id =${id} RETURNING *`);
 
     res.json({ message: 'Data updated successfully', data: data.rows[0] });
   } catch (err) {
