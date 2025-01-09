@@ -96,7 +96,7 @@ app.post('/data', async(req, res) => {
 
 });
 
-app.update('/data/:id', async (req, res) => {
+app.put('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, lastname, age, gender } = req.body;
