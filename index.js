@@ -116,11 +116,13 @@ app.put('/data/:id', async (req, res) => {
 app.delete('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.query(`DELETE from test WHERE id =${id}`);
+    const result = await db.query(`SELECT * from test WHERE id =${id}`);
 
     if (!result.rows[0]) {
       return res.status(404).json({ error: "Resource not found" });
     }
+
+    await db.query(`DELETE from test WHERE id =${id}`);
 
     res.json({ message: 'Datos eliminados correctamente' });
   } catch (err) {
