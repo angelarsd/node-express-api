@@ -12,9 +12,7 @@ const CONFIG_DB = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
-  ssl: {
-    rejectUnauthorized: true, // SSL connection settings
-  },
+  ssl: { rejectUnauthorized: true }, // SSL connection settings
 };
 
 // const server = http.createServer((req, res) => {
@@ -23,7 +21,9 @@ const CONFIG_DB = {
 
 //   if (req.method === 'GET' && req.url === '/') {
 //     res.writeHead(200);
-//     res.end(JSON.stringify({ message: 'Welcome to the basic API without Express!' }));
+//     res.end(JSON.stringify({ 
+//        message: 'Welcome to the basic API without Express!' 
+//     }));
 //   } else {
 //     res.writeHead(404);
 //     res.end(JSON.stringify({ message: 'Route not found' }));
@@ -83,8 +83,12 @@ app.get('/data/:id', async (req, res) => {
 app.post('/data', async (req, res) => {
   try {
     const { name, lastname, age, gender, email } = req.body;
-    const query = `INSERT INTO public.test (id, "name", lastname, age, gender, email) 
-    VALUES(nextval('test_id_seq'::regclass), '${name}', '${lastname}', '${age}', '${gender}', '${email}') RETURNING *`;
+    const query = 
+      `INSERT INTO public.test (id, "name", lastname, age, gender, email) 
+        VALUES(
+          nextval('test_id_seq'::regclass),
+          '${name}', '${lastname}', '${age}', '${gender}', '${email}'
+        ) RETURNING *`;
     const result = await db.query(query);
 
     res
@@ -107,7 +111,13 @@ app.put('/data/:id', async (req, res) => {
     }
 
     const data = await db.query(
-      `UPDATE test SET "name"='${name}', lastname='${lastname}', gender='${gender}', age='${age}', email='${email}' WHERE id =${id} RETURNING *`
+      `UPDATE test SET 
+        "name"='${name}', 
+        lastname='${lastname}', 
+        gender='${gender}', 
+        age='${age}', 
+        email='${email}' 
+      WHERE id =${id} RETURNING *`
     );
 
     res.json({ message: 'Data updated successfully', data: data.rows[0] });
