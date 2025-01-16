@@ -1,8 +1,10 @@
-const express = require('express');
-require('dotenv').config();
-const { Client } = require('pg');
-//const http = require('http');
-const cors = require('cors');
+import express, { json } from 'express';
+import dotenv from 'dotenv';
+import postgresql from 'pg';
+import cors from 'cors';
+
+const { Client } = postgresql;
+dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
@@ -32,7 +34,7 @@ const CONFIG_DB = {
 
 const app = express();
 
-app.use(express.json());
+app.use(json());
 app.use(cors());
 
 const db = new Client(CONFIG_DB);
@@ -129,12 +131,6 @@ app.put('/data/:id', async (req, res) => {
 
 app.delete('/data/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await db.query(`SELECT * from test WHERE id =${id}`);
-
-    if (!result.rows[0]) {
-      return res.status(404).json({ error: 'Resource not found' });
-    }
 
     await db.query(`DELETE from test WHERE id =${id}`);
 
