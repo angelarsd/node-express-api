@@ -108,13 +108,7 @@ app.put('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, lastname, age, gender, email } = req.body;
-    const result = await db.query(`SELECT * from test WHERE id =${id}`);
-
-    if (!result.rows[0]) {
-      return res.status(404).json({ error: 'Resource not found' });
-    }
-
-    const data = await db.query(
+    const result =  await db.query(
       `UPDATE test SET 
         "name"='${name}', 
         lastname='${lastname}', 
@@ -123,6 +117,10 @@ app.put('/data/:id', async (req, res) => {
         email='${email}' 
       WHERE id =${id} RETURNING *`
     );
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: 'Resource not found' });
+    }
 
     res.json({ message: 'Data updated successfully', data: data.rows[0] });
   } catch (err) {
@@ -133,7 +131,12 @@ app.put('/data/:id', async (req, res) => {
 
 app.delete('/data/:id', async (req, res) => {
   try {
+    const { id } = req.params;
     const result = await db.query(`DELETE from test WHERE id =${id} RETURNING *`);
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
 
     res.json({ message: 'Data deleted successfully', data: result.rows[0] });
   } catch (err) {
