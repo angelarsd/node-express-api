@@ -2,9 +2,11 @@ import express, { json } from 'express';
 import dotenv from 'dotenv';
 import postgresql from 'pg';
 import cors from 'cors';
+import { faker } from '@faker-js/faker';
 
 const { Client } = postgresql;
 dotenv.config();
+faker.locale = 'es';
 
 const PORT = process.env.PORT || 3000;
 
@@ -131,8 +133,7 @@ app.put('/data/:id', async (req, res) => {
 
 app.delete('/data/:id', async (req, res) => {
   try {
-
-    await db.query(`DELETE from test WHERE id =${id}`);
+    const result = await db.query(`DELETE from test WHERE id =${id} RETURNING *`);
 
     res.json({ message: 'Data deleted successfully', data: result.rows[0] });
   } catch (err) {
@@ -140,6 +141,38 @@ app.delete('/data/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get('#/fake', async (req, res) => {
+  try {
+    const totalRecords = 100; // Número de registros a generar
+
+    for (let i = 0; i < totalRecords; i++) {
+      const name = faker.person.firstName();
+      const lastname = faker.person.lastName();
+      const age = faker.number.int({ min: 18, max: 70 });
+
+      // Mapeo para convertir 'male' o 'female' a 'M' o 'F'
+      const genderMap = {
+        male: 'M',
+        female: 'F'
+      };
+      const gender = genderMap[faker.person.sex()];
+      const email = faker.internet.email(name, lastname);
+
+      // Inserta los datos en la base de datos
+      await db.query(
+        'INSERT INTO test (name, lastname, age, gender, email) VALUES ($1, $2, $3, $4, $5)',
+        [name, lastname, age, gender, email]
+      );
+
+      console.log(`Registro ${i + 1} insertado:`, { name, lastname, age, gender, email });
+    }
+
+    console.log(`${totalRecords} registros insertados correctamente.`);
+  } catch (err) {
+    console.error("Error insertando datos de prueba:", err);
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
