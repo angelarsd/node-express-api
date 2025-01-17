@@ -122,7 +122,7 @@ app.put('/data/:id', async (req, res) => {
       return res.status(404).json({ error: 'Resource not found' });
     }
 
-    res.json({ message: 'Data updated successfully', data: data.rows[0] });
+    res.json({ message: 'Data updated successfully', data: result.rows[0] });
   } catch (err) {
     console.error('Error executing the query:', err);
     res.status(500).json({ error: 'Internal server error' });
