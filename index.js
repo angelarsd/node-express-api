@@ -132,10 +132,11 @@ app.put('/data/:id', async (req, res) => {
 app.delete('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.query(`DELETE from test WHERE id =${id} RETURNING *`);
+    const result = await db.query(
+      `DELETE from test WHERE id =${id} RETURNING *`);
 
     if (!result.rows[0]) {
-      return res.status(404).json({ error: "Resource not found" });
+      return res.status(404).json({ error: 'Resource not found' });
     }
 
     res.json({ message: 'Data deleted successfully', data: result.rows[0] });
@@ -145,7 +146,7 @@ app.delete('/data/:id', async (req, res) => {
   }
 });
 
-app.get('#/fake', async (req, res) => {
+app.get('#/fake', async () => {
   try {
     const totalRecords = 100; // Número de registros a generar
 
@@ -164,18 +165,20 @@ app.get('#/fake', async (req, res) => {
 
       // Inserta los datos en la base de datos
       await db.query(
-        'INSERT INTO test (name, lastname, age, gender, email) VALUES ($1, $2, $3, $4, $5)',
+        `INSERT INTO test (name, lastname, age, gender, email) 
+        VALUES ($1, $2, $3, $4, $5)`,
         [name, lastname, age, gender, email]
       );
 
-      console.log(`Registro ${i + 1} insertado:`, { name, lastname, age, gender, email });
+      console.log(`Registro ${i + 1} insertado:`,
+        { name, lastname, age, gender, email });
     }
 
     console.log(`${totalRecords} registros insertados correctamente.`);
   } catch (err) {
-    console.error("Error insertando datos de prueba:", err);
+    console.error('Error insertando datos de prueba:', err);
   }
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
