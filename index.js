@@ -70,7 +70,7 @@ app.get('/data', async (req, res) => {
       conditions.push(`lastname ILIKE '%${lastName}%'`);
     }
     if (age) {
-      conditions.push(`age = ${age}`);
+      conditions.push(`CAST(age AS TEXT) = '${age}'`);
     }
     if (gender) {
       conditions.push(`gender LIKE '${gender}'`);
