@@ -60,7 +60,29 @@ app.get('/', (req, res) => {
 
 app.get('/data', async (req, res) => {
   try {
-    const result = await db.query('SELECT * from test');
+    const { name, lastName, age, gender, email} = req.query;
+
+    const conditions = [];
+    if (name) {
+      conditions.push(`"name" ILIKE '%${name}%'`);
+    }
+    if (lastName) {
+      conditions.push(`lastname ILIKE '%${lastName}%'`);
+    }
+    if (age) {
+      conditions.push(`age = ${age}`);
+    }
+    if (gender) {
+      conditions.push(`gender LIKE '${gender}'`);
+    }
+    if (email) {
+      conditions.push(`email ILIKE '%${email}%'`);
+    }
+
+    const query = `SELECT * FROM test${conditions.length ? 
+      ' WHERE ' + conditions.join(' AND ') : ''}`;
+
+    const result = await db.query(query);
     res.json({ result: result.rows });
   } catch (err) {
     console.error('Error executing the query:', err);
